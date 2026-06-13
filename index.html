@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Number Base Converter</title>
+<style>
+:root {
+  --bg: #fafaf6;
+  --surface: #ffffff;
+  --ink: #0a1d1e;
+  --ink-soft: #2c4a4c;
+  --rule: #c8d4d3;
+  --teal: #0f5c60;
+  --teal-deep: #0a4548;
+  --gold: #b07d2a;
+  --gold-deep: #8a611f;
+  --ok: #1a5c2e;
+  --warn: #8a5a00;
+  --err: #8b1a1a;
+  --code-bg: #f0ebe1;
+}
+[data-theme="dark"] {
+  --bg: #0c1c1d;
+  --surface: #14292a;
+  --ink: #e8ebe6;
+  --ink-soft: #b0c0bd;
+  --rule: #2a4042;
+  --teal: #4ab4ba;
+  --teal-deep: #6dc8ce;
+  --gold: #d4a155;
+  --gold-deep: #e6b876;
+  --ok: #6dd380;
+  --warn: #d4a155;
+  --err: #e88080;
+  --code-bg: #0a1718;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: ui-serif, Georgia, "Times New Roman", serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  line-height: 1.55;
+}
+.wrap { max-width: 1100px; margin: 0 auto; }
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 2px solid var(--teal);
+  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+}
+h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--teal);
+}
+.tag {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.75rem;
+  color: var(--gold-deep);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+[data-theme="dark"] .tag { color: var(--gold); }
+.theme-btn {
+  background: transparent;
+  border: 1px solid var(--rule);
+  color: var(--ink-soft);
+  padding: 0.4rem 0.85rem;
+  font-size: 0.8rem;
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: 2px;
+}
+.theme-btn:hover { border-color: var(--teal); color: var(--teal); }
+.lede {
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  margin-bottom: 1.75rem;
+  max-width: 64ch;
+}
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  border-radius: 3px;
+}
+.field { margin-bottom: 1.1rem; }
+.field:last-child { margin-bottom: 0; }
+.field-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.4rem;
+}
+label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
+.base-note {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+}
+.row { display: flex; gap: 0.6rem; align-items: stretch; }
+input[type="text"], input[type="number"] {
+  flex: 1 1 auto;
+  width: 100%;
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  padding: 0.7rem 0.85rem;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.95rem;
+  border-radius: 2px;
+}
+input:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
+input.bad { border-color: var(--err); outline-color: var(--err); }
+button.copy {
+  font-family: inherit;
+  font-size: 0.78rem;
+  padding: 0 0.95rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  border-radius: 2px;
+  flex: 0 0 auto;
+}
+button.copy:hover { border-color: var(--teal); color: var(--teal); }
+.arb-base {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+.arb-base input {
+  flex: 0 0 4.5rem;
+  width: 4.5rem;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.85rem;
+}
+.err-line {
+  color: var(--err);
+  font-size: 0.78rem;
+  margin-top: 0.35rem;
+  min-height: 1rem;
+}
+.privacy-note {
+  font-size: 0.78rem;
+  color: var(--gold-deep);
+  margin-top: 0.35rem;
+}
+[data-theme="dark"] .privacy-note { color: var(--gold); }
+.clear-row { margin-bottom: 1.25rem; }
+.clear-row button {
+  font-family: inherit;
+  font-size: 0.85rem;
+  padding: 0.55rem 1.1rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  border-radius: 2px;
+}
+.clear-row button:hover { border-color: var(--teal); }
+footer {
+  margin-top: 3rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+footer a { color: var(--teal); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+@media (max-width: 640px) {
+  body { padding: 1rem 0.75rem; }
+  h1 { font-size: 1.4rem; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <h1>Number Base Converter</h1>
+    <div class="tag">Exact conversion in your browser</div>
+  </div>
+  <button class="theme-btn" id="theme-toggle" type="button">Dark</button>
+</header>
+
+<p class="lede">Convert an integer between binary, octal, decimal, hexadecimal, and any base from 2 to 36. Type in any field and the others update live. Uses BigInt, so even very large numbers stay exact. Nothing leaves this page.</p>
+
+<div class="clear-row">
+  <button id="clear-btn" type="button">Clear all</button>
+</div>
+
+<div class="panel">
+  <div class="field">
+    <div class="field-head"><label for="f-bin">Binary</label><span class="base-note">base 2</span></div>
+    <div class="row">
+      <input type="text" id="f-bin" data-base="2" placeholder="1010" spellcheck="false" autocapitalize="off" autocorrect="off" inputmode="text">
+      <button class="copy" data-copy="f-bin" type="button">Copy</button>
+    </div>
+    <div class="err-line" id="e-bin"></div>
+  </div>
+
+  <div class="field">
+    <div class="field-head"><label for="f-oct">Octal</label><span class="base-note">base 8</span></div>
+    <div class="row">
+      <input type="text" id="f-oct" data-base="8" placeholder="12" spellcheck="false" autocapitalize="off" autocorrect="off">
+      <button class="copy" data-copy="f-oct" type="button">Copy</button>
+    </div>
+    <div class="err-line" id="e-oct"></div>
+  </div>
+
+  <div class="field">
+    <div class="field-head"><label for="f-dec">Decimal</label><span class="base-note">base 10</span></div>
+    <div class="row">
+      <input type="text" id="f-dec" data-base="10" placeholder="10" spellcheck="false" autocapitalize="off" autocorrect="off">
+      <button class="copy" data-copy="f-dec" type="button">Copy</button>
+    </div>
+    <div class="err-line" id="e-dec"></div>
+  </div>
+
+  <div class="field">
+    <div class="field-head"><label for="f-hex">Hexadecimal</label><span class="base-note">base 16</span></div>
+    <div class="row">
+      <input type="text" id="f-hex" data-base="16" placeholder="a" spellcheck="false" autocapitalize="off" autocorrect="off">
+      <button class="copy" data-copy="f-hex" type="button">Copy</button>
+    </div>
+    <div class="err-line" id="e-hex"></div>
+  </div>
+
+  <div class="field">
+    <div class="field-head"><label for="f-arb">Arbitrary base</label><span class="base-note">base 2 to 36</span></div>
+    <div class="arb-base">
+      <label for="arb-base-input" style="text-transform:none;letter-spacing:0;font-weight:400;">Base</label>
+      <input type="number" id="arb-base-input" min="2" max="36" value="36">
+    </div>
+    <div class="row">
+      <input type="text" id="f-arb" placeholder="a" spellcheck="false" autocapitalize="off" autocorrect="off">
+      <button class="copy" data-copy="f-arb" type="button">Copy</button>
+    </div>
+    <div class="err-line" id="e-arb"></div>
+  </div>
+  <div class="privacy-note">All conversion happens locally in your browser. Nothing is sent to any server.</div>
+</div>
+
+<footer>
+  <div>Number Base Converter. Open source, MIT licensed. <a href="https://github.com/0xelitesystem/number-base-converter" target="_blank" rel="noopener">View source</a>.</div>
+  <div>BigInt arithmetic, exact for any size.</div>
+</footer>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+
+const themeBtn = $("theme-toggle");
+function setTheme(t) {
+  document.documentElement.setAttribute("data-theme", t);
+  themeBtn.textContent = t === "dark" ? "Light" : "Dark";
+}
+themeBtn.addEventListener("click", () => {
+  const cur = document.documentElement.getAttribute("data-theme") || "light";
+  setTheme(cur === "dark" ? "light" : "dark");
+});
+
+const DIGITS = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+// Parse a string in the given base into a BigInt. Accepts an optional
+// leading minus sign and is case-insensitive. Throws with the offending
+// character so the caller can show a precise error.
+function parseToBig(str, base) {
+  let s = str.trim();
+  if (s === "") return null; // empty means "no value", not an error
+  let neg = false;
+  if (s[0] === "+") s = s.slice(1);
+  else if (s[0] === "-") { neg = true; s = s.slice(1); }
+  if (s === "") throw new Error("No digits after sign.");
+  s = s.toLowerCase();
+  const bigBase = BigInt(base);
+  let acc = 0n;
+  for (const ch of s) {
+    const d = DIGITS.indexOf(ch);
+    if (d === -1 || d >= base) {
+      throw new Error(`"${ch}" is not a valid digit in base ${base}.`);
+    }
+    acc = acc * bigBase + BigInt(d);
+  }
+  return neg ? -acc : acc;
+}
+
+// Render a BigInt into the given base. Handles negatives and zero.
+function bigToBase(value, base) {
+  if (value === 0n) return "0";
+  const neg = value < 0n;
+  let v = neg ? -value : value;
+  const bigBase = BigInt(base);
+  let out = "";
+  while (v > 0n) {
+    const rem = Number(v % bigBase);
+    out = DIGITS[rem] + out;
+    v = v / bigBase;
+  }
+  return (neg ? "-" : "") + out;
+}
+
+const FIELDS = [
+  { input: "f-bin", err: "e-bin", base: () => 2 },
+  { input: "f-oct", err: "e-oct", base: () => 8 },
+  { input: "f-dec", err: "e-dec", base: () => 10 },
+  { input: "f-hex", err: "e-hex", base: () => 16 },
+  { input: "f-arb", err: "e-arb", base: () => getArbBase() },
+];
+
+function getArbBase() {
+  let b = parseInt($("arb-base-input").value, 10);
+  if (!isFinite(b)) b = 10;
+  if (b < 2) b = 2;
+  if (b > 36) b = 36;
+  return b;
+}
+
+function clearErrors() {
+  for (const f of FIELDS) {
+    $(f.err).textContent = "";
+    $(f.input).classList.remove("bad");
+  }
+}
+
+// When one field changes, parse it and repaint every other field.
+function onInput(sourceId) {
+  clearErrors();
+  const src = FIELDS.find((f) => f.input === sourceId);
+  const raw = $(src.input).value;
+  const base = src.base();
+
+  let value;
+  try {
+    value = parseToBig(raw, base);
+  } catch (e) {
+    $(src.err).textContent = e.message;
+    $(src.input).classList.add("bad");
+    return;
+  }
+
+  // Empty source clears every other field.
+  if (value === null) {
+    for (const f of FIELDS) {
+      if (f.input !== sourceId) $(f.input).value = "";
+    }
+    return;
+  }
+
+  for (const f of FIELDS) {
+    if (f.input === sourceId) continue;
+    $(f.input).value = bigToBase(value, f.base());
+  }
+}
+
+FIELDS.forEach((f) => {
+  $(f.input).addEventListener("input", () => onInput(f.input));
+});
+
+// Changing the arbitrary base re-derives the arbitrary field from the
+// current decimal value (the canonical source if it holds a valid number).
+$("arb-base-input").addEventListener("input", () => {
+  clearErrors();
+  const decRaw = $("f-dec").value.trim();
+  if (decRaw === "") { $("f-arb").value = ""; return; }
+  try {
+    const value = parseToBig(decRaw, 10);
+    if (value !== null) $("f-arb").value = bigToBase(value, getArbBase());
+  } catch (e) {
+    // Decimal field already shows its own error elsewhere; ignore here.
+  }
+});
+
+document.querySelectorAll("button.copy").forEach((btn) => {
+  btn.addEventListener("click", async () => {
+    const target = $(btn.getAttribute("data-copy"));
+    const text = target.value;
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      const old = btn.textContent;
+      btn.textContent = "Copied";
+      setTimeout(() => { btn.textContent = old; }, 1200);
+    } catch (e) {
+      target.select();
+      document.execCommand("copy");
+    }
+  });
+});
+
+$("clear-btn").addEventListener("click", () => {
+  FIELDS.forEach((f) => { $(f.input).value = ""; });
+  clearErrors();
+});
+
+setTheme("light");
+</script>
+</body>
+</html>
